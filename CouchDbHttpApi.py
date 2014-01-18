@@ -51,6 +51,12 @@ class CouchDbHttpApiBase():
     def read(self):
         return self.httpResponse.read()
 
+    def clear_session_cookies(self):
+        self.cookieJar.clear_session_cookies()
+
+    def clear(self):
+        self.cookieJar.clear()
+        
     def getheaders(self):
         return self.httpResponse.getheaders()
 
@@ -58,16 +64,24 @@ class CouchDbHttpApiBase():
         self.open("/_log")
         #print (self.read())
 
-    def postSession(self):
-        self.open("_session", {'name': "admin", 'password': 'adminpass'})
+    def postSession(self, username, password):
+        self.open("/_session", {'name': username, 'password': password})
         #print(self.httpResponse.read())
 
 if __name__=="__main__":
-    couch_db_http_api_base = CouchDbHttpApiBase()
-    couch_db_http_api_base.getMotd()
-    #couch_db_http_api_base.getAllDbs()
-    #couch_db_http_api_base.getUuids()
-    #couch_db_http_api_base.getStats()
-    #couch_db_http_api_base.postSession()
-    couch_db_http_api_base.getLog()
-    couch_db_http_api_base.saveCookie()
+    x = CouchDbHttpApiBase()
+    #x.getMotd()
+    #x.getAllDbs()
+    #x.getUuids()
+    #x.getStats()
+    #x.postSession()
+    try:
+        x.getLog()
+    except urllib.error.HTTPError as e:
+        print (e)
+        username=input("username > ")
+        password=input("password > ")
+        x.postSession(username, password)
+        x.getLog()
+    print (x.read())
+    x.saveCookie()
