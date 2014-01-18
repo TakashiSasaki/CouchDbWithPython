@@ -50,17 +50,22 @@ class CouchDbHttpApiBase():
         if isinstance(dict_or_list_of_tuple, list):
             data = urllib.parse.urlencode(dict_or_list_of_tuple)
             data = data.encode("utf-8")
+            method="POST"
+            req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
         elif isinstance(dict_or_list_of_tuple, dict):
             data = json.dumps(dict_or_list_of_tuple)
             data = data.encode("utf-8")
+            assert(method is not None)
+            req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
+            req.add_header("Content-Type","application/json")
         else:
             data = None
-
-        if method is not None:
+            method="GET"
             req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
-            self.httpResponse = self.openerDirector.open(req)
-        else:
-            self.httpResponse = self.openerDirector.open("http://127.0.0.1:5984%s" % path, data)
+
+        #req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
+        self.httpResponse = self.openerDirector.open(req)
+        #self.httpResponse = self.openerDirector.open("http://127.0.0.1:5984%s" % path, data)
 
         return self.httpResponse
 
@@ -94,9 +99,10 @@ class CouchDbHttpApiBase():
         self.open("/%s/" % dbname, method="DELETE")
 
     def put(self, json_object):
-        s = json.dumps(json_object)
-        b = s.encode("utf-8")
-        self.open("/%s/" % dbname, data=b, method="PUT")
+        self.open("/%s/" % self.dbname, dict_or_list_of_tuple=json_object, method="PUT")
+
+    def post(self, json_object):
+        self.open("/%s/" % self.dbname, dict_or_list_of_tuple=json_object, method="POST")
 
 if __name__=="__main__":
     x = CouchDbHttpApiBase("mydb")
@@ -117,5 +123,6 @@ if __name__=="__main__":
     print (x.read())
     x.getAllDbs()
     #x.deleteDb("mydb")
+    x.post({"a":1})
     x.saveCookie()
     
