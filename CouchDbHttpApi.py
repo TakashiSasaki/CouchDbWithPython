@@ -123,12 +123,37 @@ class CouchDbHttpApiBase():
         self.open("/%s/_design/%s" % (self.dbname, design_name), method="GET")
         return json.loads(self.read().decode("utf-8"))
 
+    def getDesignDocumentInfo(self, design_name):
+        self.open("/%s/_design/%s/_info" % (self.dbname, design_name), method="GET")
+        return json.loads(self.read().decode("utf-8"))        
+
+    def getDesignDocumentView(self, design_name, view_name):
+        self.open("/%s/_design/%s/_view/%s" % (self.dbname, design_name, view_name), method="GET")
+        return json.loads(self.read().decode("utf-8"))        
+
 design_document = {
        "language"    : "javascript" ,
        "views"       : {
-          "view1"  : {
-             "map"    : "function(doc){ ... }",
-             "reduce" : "function(key, values, rereduce){ ... }"
+          "sum"  : {
+             "map"    : """function(doc){
+                 //emit(doc.x, doc.y);
+                 emit(1,1);
+                 }
+             """,
+             "reduce" : """function(key, values, rereduce){
+                 if(rereduce){
+                   var sum = 0;
+                   for(v in values){
+                     sum += v;
+                   }//for
+                   return v;
+                 }//if
+                 sum=0;
+                 for(v in values){
+                   sum += v;
+                 }//for
+                 return v;
+             }"""
           },
           "view2" : {
              "map"    : "function(doc){ ... }",
@@ -161,8 +186,13 @@ if __name__=="__main__":
     try:
         r = x.put({"a":1}, id="12345")
     except: pass
+    try:
+        r = x.getDesignDocument("dd2")
+        r = x.deleteDesignDocument("dd2", r["_rev"])
+    except urllib.error.HTTPError as e: pass
+    r = x.putDesignDocument("dd2", design_document)
     r = x.getDesignDocument("dd2")
-    r = x.deleteDesignDocument("dd2", r["_rev"])
-    #r = x.putDesignDocument("dd2", design_document)
-    #r = x.getDesignDocument("dd2")
+    r = x.getDesignDocumentInfo("dd2")
+    #r = x.getDesignDocumentView("dd2", "sum")
+    print(r)
     x.saveCookie()
