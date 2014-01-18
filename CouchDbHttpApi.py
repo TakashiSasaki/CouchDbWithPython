@@ -1,4 +1,4 @@
-import http.cookiejar, urllib.request
+import http.cookiejar, urllib.request, json
 class CouchDbHttpApiBase():
     def __init__(self, dbname):
         self.dbname = dbname
@@ -47,8 +47,11 @@ class CouchDbHttpApiBase():
         print (self.getheaders())
 
     def open(self, path, dict_or_list_of_tuple=None, method=None):
-        if dict_or_list_of_tuple is not None:
+        if isinstance(dict_or_list_of_tuple, list):
             data = urllib.parse.urlencode(dict_or_list_of_tuple)
+            data = data.encode("utf-8")
+        elif isinstance(dict_or_list_of_tuple, dict):
+            data = json.dumps(dict_or_list_of_tuple)
             data = data.encode("utf-8")
         else:
             data = None
@@ -81,7 +84,7 @@ class CouchDbHttpApiBase():
         #print (self.read())
 
     def postSession(self, username, password):
-        self.open("/_session", {'name': username, 'password': password})
+        self.open("/_session", [('name', username), ('password', password)])
         #print(self.httpResponse.read())
 
     def putDb(self, dbname):
@@ -89,6 +92,11 @@ class CouchDbHttpApiBase():
 
     def deleteDb(self, dbname):
         self.open("/%s/" % dbname, method="DELETE")
+
+    def put(self, json_object):
+        s = json.dumps(json_object)
+        b = s.encode("utf-8")
+        self.open("/%s/" % dbname, data=b, method="PUT")
 
 if __name__=="__main__":
     x = CouchDbHttpApiBase("mydb")
