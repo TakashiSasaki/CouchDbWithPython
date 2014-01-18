@@ -1,6 +1,7 @@
 import http.cookiejar, urllib.request
 class CouchDbHttpApiBase():
-    def __init__(self):
+    def __init__(self, dbname):
+        self.dbname = dbname
         self.cookieJar = http.cookiejar.LWPCookieJar('cookie.txt')
         self.cookieProcessor = urllib.request.HTTPCookieProcessor(self.cookieJar)
         self.openerDirector = urllib.request.build_opener(self.cookieProcessor)
@@ -9,6 +10,14 @@ class CouchDbHttpApiBase():
             self.cookieJar.load(ignore_discard=True, ignore_expires=True)
         except FileNotFoundError:
             pass
+        try:
+            self.getLog()
+        except urllib.error.HTTPError as e:
+            print (e)
+            username=input("username > ")
+            password=input("password > ")
+            self.postSession(username, password)
+        
 
     def saveCookie(self):
         self.cookieJar.save(ignore_discard=True, ignore_expires=True)
@@ -82,7 +91,7 @@ class CouchDbHttpApiBase():
         self.open("/%s/" % dbname, method="DELETE")
 
 if __name__=="__main__":
-    x = CouchDbHttpApiBase()
+    x = CouchDbHttpApiBase("mydb")
     x.getMotd()
     print(x.read())
     x.getAllDbs()
@@ -98,10 +107,7 @@ if __name__=="__main__":
         x.postSession(username, password)
         x.getLog()
     print (x.read())
-    try:
-        x.putDb("mydb")
-    except:
-        pass
     x.getAllDbs()
     #x.deleteDb("mydb")
     x.saveCookie()
+    
