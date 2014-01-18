@@ -10,6 +10,7 @@ class CouchDbHttpApiBase():
             self.cookieJar.load(ignore_discard=True, ignore_expires=True)
         except FileNotFoundError:
             pass
+        
         try:
             self.getLog()
         except urllib.error.HTTPError as e:
@@ -17,6 +18,11 @@ class CouchDbHttpApiBase():
             username=input("username > ")
             password=input("password > ")
             self.postSession(username, password)
+            
+        try:
+            self.putDb(self.dbname)
+        except urllib.error.HTTPError as e:
+            pass
         
 
     def saveCookie(self):
@@ -59,8 +65,8 @@ class CouchDbHttpApiBase():
             req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
             req.add_header("Content-Type","application/json")
         else:
+            if method is None: method="GET"
             data = None
-            method="GET"
             req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
 
         #req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
@@ -109,6 +115,14 @@ class CouchDbHttpApiBase():
         self.open("/%s/_design/%s" % (self.dbname, design_name), dict_or_list_of_tuple=json_object, method="PUT")
         return json.loads(self.read().decode("utf-8"))
         
+    def deleteDesignDocument(self, design_name, rev):
+        self.open("/%s/_design/%s?rev=%s" % (self.dbname, design_name, rev), method="DELETE")
+        return json.loads(self.read().decode("utf-8"))
+
+    def getDesignDocument(self, design_name):
+        self.open("/%s/_design/%s" % (self.dbname, design_name), method="GET")
+        return json.loads(self.read().decode("utf-8"))
+
 
 if __name__=="__main__":
     x = CouchDbHttpApiBase("mydb")
@@ -129,11 +143,28 @@ if __name__=="__main__":
     print (x.read())
     x.getAllDbs()
     #x.deleteDb("mydb")
-    r = x.post({"a":1})
+    r = x.post({"aa":1})
     print(r)
     r = x.post({"b":2, "_id":r["id"], "_rev":r["rev"]})
     try:
         r = x.put({"a":1}, id="12345")
     except: pass
-    r = x.putDesignDocument("dd1", {})
+    r = x.getDesignDocument("dd2")
+    r = x.deleteDesignDocument("dd2", r["_rev"])
+    print (r)
+    #r = x.putDesignDocument("dd2", {
+    #   "language"    : "javascript" ,
+    #   "views"       : {
+    #      "view1"  : {
+    #         "map"    : "function(doc){ ... }",
+    #         "reduce" : "function(key, values, rereduce){ ... }"
+    #      },
+    #      "view2" : {
+    #         "map"    : "function(doc){ ... }",
+    #         "reduce" : "function(key, values, rereduce){ ... }"
+    #      }
+    #   }})
+    #print(r)
+    r = x.getDesignDocument("dd2")
+    print (r)
     x.saveCookie()
