@@ -76,11 +76,10 @@ class CouchDbHttpApiBase():
         #print(self.httpResponse.read())
 
     def putDb(self, dbname):
-        self.open("/%s" % dbname, method="PUT")
-        pass
+        self.open("/%s/" % dbname, method="PUT")
 
     def deleteDb(self, dbname):
-        pass
+        self.open("/%s/" % dbname, method="DELETE")
 
 if __name__=="__main__":
     x = CouchDbHttpApiBase()
@@ -99,6 +98,10 @@ if __name__=="__main__":
         x.postSession(username, password)
         x.getLog()
     print (x.read())
-    x.putDb("mydb")
+    try:
+        x.putDb("mydb")
+    except:
+        pass
     x.getAllDbs()
+    #x.deleteDb("mydb")
     x.saveCookie()
