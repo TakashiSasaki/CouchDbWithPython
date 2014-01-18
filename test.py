@@ -16,7 +16,7 @@ def testUrllib():
 
 def testCookieJar():
     import http.cookiejar, urllib.request
-    cj = http.cookiejar.MozillaCookieJar()
+    cj = http.cookiejar.LWPCookieJar()
     cp = urllib.request.HTTPCookieProcessor(cj)
     opener = urllib.request.build_opener(cp)
     #r = opener.open("http://yahoo.co.jp/index.html")
