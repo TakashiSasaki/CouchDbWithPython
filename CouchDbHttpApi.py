@@ -123,6 +123,18 @@ class CouchDbHttpApiBase():
         self.open("/%s/_design/%s" % (self.dbname, design_name), method="GET")
         return json.loads(self.read().decode("utf-8"))
 
+design_document = {
+       "language"    : "javascript" ,
+       "views"       : {
+          "view1"  : {
+             "map"    : "function(doc){ ... }",
+             "reduce" : "function(key, values, rereduce){ ... }"
+          },
+          "view2" : {
+             "map"    : "function(doc){ ... }",
+             "reduce" : "function(key, values, rereduce){ ... }"
+          }
+       }}
 
 if __name__=="__main__":
     x = CouchDbHttpApiBase("mydb")
@@ -151,20 +163,6 @@ if __name__=="__main__":
     except: pass
     r = x.getDesignDocument("dd2")
     r = x.deleteDesignDocument("dd2", r["_rev"])
-    print (r)
-    #r = x.putDesignDocument("dd2", {
-    #   "language"    : "javascript" ,
-    #   "views"       : {
-    #      "view1"  : {
-    #         "map"    : "function(doc){ ... }",
-    #         "reduce" : "function(key, values, rereduce){ ... }"
-    #      },
-    #      "view2" : {
-    #         "map"    : "function(doc){ ... }",
-    #         "reduce" : "function(key, values, rereduce){ ... }"
-    #      }
-    #   }})
-    #print(r)
-    r = x.getDesignDocument("dd2")
-    print (r)
+    #r = x.putDesignDocument("dd2", design_document)
+    #r = x.getDesignDocument("dd2")
     x.saveCookie()
