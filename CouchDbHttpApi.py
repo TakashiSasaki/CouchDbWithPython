@@ -98,8 +98,8 @@ class CouchDbHttpApiBase():
     def deleteDb(self, dbname):
         self.open("/%s/" % dbname, method="DELETE")
 
-    def put(self, json_object):
-        self.open("/%s/" % self.dbname, dict_or_list_of_tuple=json_object, method="PUT")
+    def put(self, json_object, id):
+        self.open("/%s/%s" % (self.dbname, id), dict_or_list_of_tuple=json_object, method="PUT")
 
     def post(self, json_object):
         self.open("/%s/" % self.dbname, dict_or_list_of_tuple=json_object, method="POST")
@@ -127,5 +127,5 @@ if __name__=="__main__":
     r = x.post({"a":1})
     print(r)
     r = x.post({"b":2, "_id":r["id"], "_rev":r["rev"]})
+    r = x.put({"a":1}, id="12345")
     x.saveCookie()
-    
