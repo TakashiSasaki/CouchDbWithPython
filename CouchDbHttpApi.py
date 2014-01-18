@@ -105,6 +105,11 @@ class CouchDbHttpApiBase():
         self.open("/%s/" % self.dbname, dict_or_list_of_tuple=json_object, method="POST")
         return json.loads(self.read().decode("utf-8"))
 
+    def putDesignDocument(self, design_name, json_object):
+        self.open("/%s/_design/%s" % (self.dbname, design_name), dict_or_list_of_tuple=json_object, method="PUT")
+        return json.loads(self.read().decode("utf-8"))
+        
+
 if __name__=="__main__":
     x = CouchDbHttpApiBase("mydb")
     x.getMotd()
@@ -127,5 +132,8 @@ if __name__=="__main__":
     r = x.post({"a":1})
     print(r)
     r = x.post({"b":2, "_id":r["id"], "_rev":r["rev"]})
-    r = x.put({"a":1}, id="12345")
+    try:
+        r = x.put({"a":1}, id="12345")
+    except: pass
+    r = x.putDesignDocument("dd1", {})
     x.saveCookie()
