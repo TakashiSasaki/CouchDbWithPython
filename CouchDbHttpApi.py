@@ -156,8 +156,8 @@ design_document = {
              }"""
           },
           "view2" : {
-             "map"    : "function(doc){ ... }",
-             "reduce" : "function(key, values, rereduce){ ... }"
+             "map"    : "function(doc){}",
+             "reduce" : "function(key, values, rereduce){}"
           }
        }}
 
@@ -193,6 +193,6 @@ if __name__=="__main__":
     r = x.putDesignDocument("dd2", design_document)
     r = x.getDesignDocument("dd2")
     r = x.getDesignDocumentInfo("dd2")
-    #r = x.getDesignDocumentView("dd2", "sum")
+    r = x.getDesignDocumentView("dd2", "sum")
     print(r)
     x.saveCookie()
