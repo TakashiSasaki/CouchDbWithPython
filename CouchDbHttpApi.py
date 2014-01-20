@@ -1,3 +1,8 @@
+"""
+CouchDbHttpApi
+"""
+__author__="Takashi SASAKI"
+
 import http.cookiejar, urllib.request, json
 class CouchDbHttpApiBase():
     def __init__(self, dbname):
