@@ -119,38 +119,44 @@ design_document = {
           }
        }}
 
-if __name__=="__main__":
-    x = CouchDbHttpApi("mydb")
-    x.getMotd()
-    print(x.read())
-    x.getAllDbs()
-    #x.getUuids()
-    #x.getStats()
-    #x.postSession()
-    try:
-        x.getLog()
-    except urllib.error.HTTPError as e:
-        print (e)
-        username=input("username > ")
-        password=input("password > ")
-        x.postSession(username, password)
-        x.getLog()
-    print (x.read())
-    x.getAllDbs()
-    #x.deleteDb("mydb")
-    r = x.post({"aa":1})
-    print(r)
-    r = x.post({"b":2, "_id":r["id"], "_rev":r["rev"]})
-    try:
-        r = x.put({"a":1}, id="12345")
-    except: pass
-    try:
+import unittest
+class TestMisc(unittest.TestCase):
+
+    def test(self):
+        x = CouchDbHttpApi("mydb")
+        x.getMotd()
+        print(x.read())
+        x.getAllDbs()
+        #x.getUuids()
+        #x.getStats()
+        #x.postSession()
+        try:
+            x.getLog()
+        except urllib.error.HTTPError as e:
+            print (e)
+            username=input("username > ")
+            password=input("password > ")
+            x.postSession(username, password)
+            x.getLog()
+        print (x.read())
+        x.getAllDbs()
+        #x.deleteDb("mydb")
+        r = x.post({"aa":1})
+        print(r)
+        r = x.post({"b":2, "_id":r["id"], "_rev":r["rev"]})
+        try:
+            r = x.put({"a":1}, id="12345")
+        except: pass
+        try:
+            r = x.getDesignDocument("dd2")
+            r = x.deleteDesignDocument("dd2", r["_rev"])
+        except urllib.error.HTTPError as e: pass
+        r = x.putDesignDocument("dd2", design_document)
         r = x.getDesignDocument("dd2")
-        r = x.deleteDesignDocument("dd2", r["_rev"])
-    except urllib.error.HTTPError as e: pass
-    r = x.putDesignDocument("dd2", design_document)
-    r = x.getDesignDocument("dd2")
-    r = x.getDesignDocumentInfo("dd2")
-    r = x.getDesignDocumentView("dd2", "sum")
-    print(r)
-    x.saveCookie()
+        r = x.getDesignDocumentInfo("dd2")
+        r = x.getDesignDocumentView("dd2", "sum")
+        print(r)
+        x.saveCookie()
+
+if __name__=="__main__":
+    unittest.main()

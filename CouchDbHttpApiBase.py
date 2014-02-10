@@ -54,3 +54,6 @@ class CouchDbHttpApiBase(object):
         #self.httpResponse = self.openerDirector.open("http://127.0.0.1:5984%s" % path, data)
 
         return self.httpResponse
+
+    def __del__(self):
+        self.httpResponse.close()
