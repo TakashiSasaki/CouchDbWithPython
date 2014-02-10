@@ -119,13 +119,24 @@ design_document = {
           }
        }}
 
-import unittest
+import unittest, os, time
 class TestMisc(unittest.TestCase):
+    def setUp(self):
+        self.x = CouchDbHttpApi("mydb")
 
-    def test(self):
+    def tearDown(self):
+        self.x.saveCookie()
+        self.x = None
+        time.sleep(0.001)
+
+    def testMotd(self):
+        self.x.getMotd()
+        print(self.x.read())
+        self.x.httpResponse.close()
+        
+    def aatest(self):
         x = CouchDbHttpApi("mydb")
-        x.getMotd()
-        print(x.read())
+        x = CouchDbHttpApi("mydb")
         x.getAllDbs()
         #x.getUuids()
         #x.getStats()

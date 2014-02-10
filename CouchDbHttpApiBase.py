@@ -5,11 +5,16 @@ __author__="Takashi SASAKI"
 
 import http.cookiejar, urllib.request, json
 class CouchDbHttpApiBase(object):
-    def __init__(self, dbname):
+    def __init__(self, dbname, keepalive=False):
         self.dbname = dbname
         self.cookieJar = http.cookiejar.LWPCookieJar('cookie.txt')
         self.cookieProcessor = urllib.request.HTTPCookieProcessor(self.cookieJar)
         self.openerDirector = urllib.request.build_opener(self.cookieProcessor)
+        if keepalive:
+            self.openerDirector.addheaders.append(("Connection", "keep-alive"))
+        else:
+            self.openerDirector.addheaders.append(("Connection", "close"))
+            print (self.openerDirector.addheaders)
         print(self.openerDirector)
         try:
             self.cookieJar.load(ignore_discard=True, ignore_expires=True)
@@ -48,12 +53,17 @@ class CouchDbHttpApiBase(object):
             if method is None: method="GET"
             data = None
             req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
-
+    
         #req = urllib.request.Request(url="http://127.0.0.1:5984%s" % path, data=data, method=method)
-        self.httpResponse = self.openerDirector.open(req)
+        self.httpResponse = self.openerDirector.open(req, timeout=1)
+        self.openerDirector.close()
+        self.httpResponse.close()
         #self.httpResponse = self.openerDirector.open("http://127.0.0.1:5984%s" % path, data)
 
         return self.httpResponse
 
     def __del__(self):
+        self.openerDirector.close()
+        self.openerDirector = None
         self.httpResponse.close()
+        self.httpResponse = None
